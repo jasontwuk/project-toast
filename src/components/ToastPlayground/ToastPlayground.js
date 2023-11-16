@@ -5,39 +5,24 @@ import ToastShelf from '../ToastShelf';
 
 import styles from './ToastPlayground.module.css';
 
+import { ToastContext } from '../ToastProvider';
+
 const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 
 function ToastPlayground() {
   const [message, setMessage] = React.useState("");
-  const [variant, setvariant] = React.useState(VARIANT_OPTIONS[0]);
+  const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
+  
+  const { handleAddToast } = React.useContext(ToastContext);
 
-  const [toastList, setToastList] = React.useState([]);
-
-  const handleAddToast = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    const nextToastList = [
-      ...toastList, 
-      {
-        id: crypto.randomUUID(),
-        variant: variant,
-        message: message,
-      }
-    ]
+    handleAddToast(message, variant);
 
-    setToastList(nextToastList);
-    
     // Note: reset to default values
     setMessage("");
-    setvariant(VARIANT_OPTIONS[0]);
-  }
-
-  const handleRemoveToast = (id) => {
-    const nextToastList = toastList.filter((toast) => {
-      return toast.id !== id;
-    });
-    
-    setToastList(nextToastList);
+    setVariant(VARIANT_OPTIONS[0]);
   }
 
   return (
@@ -47,9 +32,9 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toastList={toastList} handleRemoveToast={handleRemoveToast} />
+      <ToastShelf />
       
-      <form className={styles.controlsWrapper} onSubmit={(e) => handleAddToast(e)}>
+      <form className={styles.controlsWrapper} onSubmit={(e) => handleSubmit(e)}>
         <div className={styles.row}>
           <label
             htmlFor="message"
@@ -79,7 +64,7 @@ function ToastPlayground() {
                     name="variant"
                     value={option}
                     checked={variant === option}
-                    onChange={(e) => setvariant(e.target.value)}
+                    onChange={(e) => setVariant(e.target.value)}
                   />
                   {option}
                 </label>
